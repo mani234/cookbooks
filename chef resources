@@ -1,0 +1,177 @@
+_____________________________________________________________________________
+
+cd /etc/chef   -----keep client.pem, validation.pem, client.rb
+clent.rb----update node name. should mention validationa client.pem
+#______________________________________________________________________________
+port 5985 5986
+control panel---windows firewall ---in left hand side advance setting ----inboud rule----add new rule----add new port 
+
+#______________________________________________________________________________
+driver:
+  forward_agent: yes
+  name: vagrant
+  network:
+    - ["forwarded_port", {guest: 5985, host: 5985}]
+    - ["private_network", {ip: "192.168.250.250"}]
+
+#to unzip or tar in linux 
+
+execute 'extract_some_tar' do
+  command 'tar xzvf somefile.tar.gz'
+  cwd '/directory/of/tar/here'
+  not_if { File.exists?("/file/contained/in/tar/here") }
+end
+
+#To use the custom tar cookbook and definition tar_Package 
+
+https://github.com/chef-cookbooks/tar#example
+
+#Ruby sysntax:
+not if,  and only if 
+
+not_if { File.exist?(path of the file) }
+
+not_if { File.exist?(path of the file) }
+
+not_if { Dir.exists?("C:\\Program Files\\Test") }
+
+#______________________________________________________________________________
+#set env varables in linux---using ruby block
+ruby_block 'set tomcat env var' do
+  block do
+   ENV['TOMCAT_HOME'] = "/var/tmp/apache-tomcat-8.0.24"
+   ENV['PATH'] = "#{ENV['PATH']}:/var/tmp/apache-tomcat-8.0.24/bin"
+  end
+end
+
+#creating directory------------using ruby block
+ruby_block "Create Directory" do
+    block do
+      require 'fileutils'
+      puts 'Creating directory since it didnt exist'
+      FileUtils.mkdir_p("C:\\Program Files\\Test")
+    end
+    not_if { Dir.exists?("C:\\Program Files\\Test") }    action :run
+  end
+
+#______________________________________________________________________________
+#set env windows 
+
+env "JAVA_HOME" do
+  value 'C:\\Program Files\\Zulu\\zulu-8'
+end
+
+env "path" do
+  delim ";"
+  value '%JAVA_HOME%\\bin'
+  action :modify
+end
+
+#For Command Prompt
+execute "setPathCMD" do
+  command "set PATH=#{node['java']['path']}\\bin;%PATH%"
+end
+#For PowerShell
+powershell_script "setPathPS" do
+  code <<-EOH
+  $env:Path="#{node['java']['path']}\\bin;$env:Path"
+  EOH
+end
+
+ENV['Path'] += ";C:\\Program Files\\Zulu\\zulu-8\\bin"
+
+
+#______________________________________________________________________________
+#spec syntax
+
+require 'chefspec'
+
+describe 'example::default' do
+  let(:chef_run) { ChefSpec::SoloRunner.converge(described_recipe) }
+   
+  it 'installs foo' do
+    expect(chef_run).to install_package('foo')
+  end
+end
+
+#______________________________________________________________________________
+
+[‎7/‎7/‎2017 3:46 PM] Mohamed, Roshanshariff: 
+include_recipe 'bbt_oracle_java'
+oracle_java 'system_jre' do
+  version node['bbt_sonarqube']['oracle_java_version']
+  jdk true
+  default_alternative true
+  system_cacerts true
+  unlimited_strength_jce true
+end
+add this in recipe it will install java
+#______________________________________________________________________________
+
+[2017-07-21T10:02:36-04:00] WARN: node.set is deprecated and will be removed in Chef 14, please use node.default/node.override (or node.normal
+t C:/chef-repo/cookbooks/bbt_7zip/spec/unit/recipes/default_spec.rb:15:in `block (3 levels) in <top (required)>'.
+Please see https://docs.chef.io/deprecations_attributes.html for further details and information on how to correct this problem.
+
+#______________________________________________________________________________
+
+sample html page
+
+<html>
+<header><title>This is title</title></header>
+<body>
+welcome to chef overview
+</body>
+</html>
+
+template '/etc/apache2/index.html' do
+  source 'index.html.erb'
+  owner 'root'
+  group 'root'
+  mode '0755'
+end
+
+#______________________________________________________________________________
+
+databag...use if condition---if server dint have the databag ket to decrypt the databag in server----use if condition(to skip the resource)---id
+
+secretfile = '/etc/chef/encrypted_data_bag_secret'
+
+if File.exists?(secretfile) do
+secret = Chef::EncryptedDataBagItem.load_secret("/etc/chef/encrypted_data_bag_secret")
+item = Chef::EncryptedDataBagItem.load('my_databag', 'my_databag_item', secret)
+
+item['cert'].each do |cert|
+file "/opt/#{cert['filename']}" do
+  content cert['data']
+  owner 'root'
+  verify { secret != false } # dont execute template block if databag is missing encrypted_data_bag_secre
+  not_if { File.exist?("/opt/#{cert['filename']}") }
+  notifies :create, 'template[httpd.conf]', :immediately  
+  end
+end
+end
+
+_____________________________________________________________________________
+secretfile = '/etc/chef/encrypted_data_bag_secret'
+if File.exists?(secretfile)
+  secret = Chef::EncryptedDataBagItem.load_secret('/etc/chef/encrypted_data_bag_secret')
+item = Chef::EncryptedDataBagItem.load('my_databag', 'sonar_credentials', secret)
+item['certs'].each do |cert|
+   file "/etc/httpd/#{cert['filename']}" do
+    content cert['data']
+    owner 'root'
+    mode '0644'
+  end
+  item['key'].each do |pem|
+    file "/etc/httpd/#{pem['filename']}" do
+       content pem['data']
+      owner 'root'
+      mode '0400'
+     end
+  end
+ end
+end
+#______________________________________________________________________________
+
+
+
