@@ -1,0 +1,26 @@
+-Installing and configuring operating systems like  redhat linux, solaris
+-worked with upgrading and configuring redhat linux servers using kickstart 
+-configuring (volume like) logical volume manager, filesystem (veritas file system) 
+-utilized GIT amd SVN for source code managment
+-built scripts using Maven built tools in jenkins to deploy j2ee application to application server 
+-developed shell, python, ruby scrips for automation of build and release process
+-Jenkins was used as a continuous intigration tool for automation of daily process.
+-workied with docker containers as well
+-configuring puppet master and puppet client, by creating manifests to install packages, cron jobs and start servers.
+-Created, configured and managed AWS EC2 instances utilizing Elastic Load Balancing and Elastic Beanstalk for our QA and UAT environments as well as infrastructure servers for GIT and Puppet.
+- worked on ansible, creating playbooks and run themgvgg
+- using Nagios tool for monitering the project. 
+
+Configured different protocols: NIS, NIS+, DNS, DHCP, NFS, LDAP, SAMBA, SQUID, postfix, Sendmail, ftp, remote access, security management and Security trouble shooting skills. 
+
+
+
+Working with configuration management tool CHEF, Responsible for writing cookbooks, managing roles, environments and data bags using CHEF.
+Developing cookbooks using Ruby script to automate infrastructure using a configuration management tool CHEF.
+Responsible for making robust cookbooks using Rspec, Inspec and Rubocop. 
+Reponsible for configuring the kitchen and then testing cookbooks with internal cloud servers VRA( vRealize Automation).
+Implementing Jenkins for continuous integration and using Jenkins pipelines for testing cookbook's static code analysis and deploying the cookbooks.  
+Working with JFROG Artifactory as repository management tool for managing artifacts and cookbook dependencies.
+Reponsible for managing and configuring Gerrit as Source code management tool for code review and team code collaboration.
+Guiding different teams to use the chef and its best practice. 
+ Overall, supports different tools like Gerrit, Jenkins, Artifactory, Chef, Chef-Compliance, VRA( vRealize Automation), Oracle Virtual box. 
