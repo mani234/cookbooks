@@ -1,0 +1,48 @@
+---
+driver:
+  name: vagrant
+  vm_hostname: w2k12r2
+provisioner:
+  name: chef_zero
+  always_update_cookbooks: true 
+verifier:
+  name: inspec
+
+platforms:
+  - name: w2k12r2rdp
+    os_type: windows
+    transport:
+      name: winrm
+      elevated: true
+
+suites:
+  - name: default
+    run_list:
+      - recipe[vagrant_helloworld::default]
+    verifier:
+      inspec_tests:
+        - test/smoke/default
+    attributes:
+
+
+*********************************************
+---
+suites:
+  - name: default
+    run_list:
+      - recipe
+    verifier:
+      inspec_tests:
+        - test/smoke/default
+    attributes:
+
+
+***********************************************
+
+***********************************************
+•Run the chef-client process from the administrator account while being logged into another account. 
+Run the following command:
+
+$ runas /user:Administrator "cmd /C chef-client"
+
+
