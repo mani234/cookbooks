@@ -1,0 +1,408 @@
+
+Git-
+https://github.com/chefspec?language=ruby
+
+
+describe '7zip::default' do
+let(:chen_run) do
+	ChefSpec::SoloRunner.new(platform: 'windows', version: '2012R2')
+	.converge(describe_recipe)
+    end
+end
+
+describe '7zip::default' do
+let(:chef_run) do
+    ChefSpec::SoloRunner.new(platform: 'windows', version: '2012R2')
+    .converge(described_recipe)
+end
+end
+
+
+##################################################
+
+cookbook_file 'C:/python-2.7.13.msi' do
+  source 'python-2.7.13.msi'
+  action :create
+end
+
+windows_package 'install_python' do
+  source 'C:\\python-2.7.13.msi'
+  action :install
+end
+
+#set environment
+#env 'set_python_env' do
+#  key_name 'Path'
+#  value '%SystemRoot%\system32;%SystemRoot%;%SystemRoot%\System32\Wbem;%SYSTEMROOT%\System32\WindowsPowerShell\v1.0\;C:\opscode\chef\bin\;C:\Python27\'
+#end
+env "Path" do
+  delim ";"
+  value 'C:\Python27'
+  action :modify
+end
+#_________________________________
+attribute \
+atribute is a specific details about the node. It is used by chef client to understand the following points.
+1. it tells the current stage of the node. and also attributes status of the node at the end of the previous chef-client run.
+2. we can update the attributes before the chef-client run for for the current execution.
+
+We can define the attributes in the attribute
+1. attribute directory
+2. roles
+3. environment
+
+
+
+1. any value may change in future
+2. we want it to be environment specfic
+
+
+mama,
+service 'sonarqube' do
+  supports restart: true, reload: false, status: true
+  action node['bbt_sonarqube']['services']['sonarqube'] ? [:enable, :Start] : [:Disable, :Stop]
+end
+e service ni stop cheyalli anthey ella
+default['bbt_sonarqube']['services']['sonarqube'] = true
+
+
+# httpd.conf template
+template 'sonar.conf' do
+  source 'sonar.conf.erb'
+  path '/etc/httpd/conf.d/sonar.conf'
+  owner 'root'
+  group 'root'
+  mode  '0644'
+  variables(
+    pass_phrase: node['bbt_sonarqube']['pass_phrase'],
+    server_name: server_name,
+    redirect_permanent: redirect_permanent,
+    proxypass_reverse: proxypass_reverse,
+    ssl_chainfile_path: ssl_chainfile_path,
+    ssl_key_file_path: ssl_key_file_path,
+    ssl_cert_file_path: ssl_cert_file_path
+  )
+  not_if { File.exists?['/etc/httpd/conf.d/sonar.conf'] }
+  nofities :reload, 'service[httpd]', :immediately
+end
+
+# plugins management
+pluginfiles = node['bbt_sonarqube']['plugins']
+pluginfiles.each do |file, source|
+  remote_file "/opt/sonar/sonarqube-5.6.6/extensions/plugins/#{file}" do
+      owner 'sonar'
+      group 'sonar'
+      mode 0744
+      source source
+      use_etag true
+      use_conditional_get true
+      action :create_if_missing
+  end
+end
+
+# Opens firewall ports
+firewalld_port '443/tcp' do
+  action :add
+  zone 'public'
+end
+
+firewalld_port '80/tcp' do
+  action :add
+  zone 'public'
+end
+
+service 'httpd' do
+  supports restart: true, reload: false, status: true
+# subscribes :reload, 'file[/etc/httpd/conf.d/sonar.conf]', :delayed
+  action :nothing
+end
+
+# starts sonarqube service
+service 'sonarqube' do
+  supports restart: true, reload: false, status: true
+  action node['bbt_sonarqube']['services']['sonarqube'] ? [:enable, :start] : [:disable, :stop]
+end
+
+execute '/etc/httpd/httpd.conf' do
+  echo 'password'
+end
+
+
+secretfile = '/etc/chef/encrypted_data_bag_secret'
+if File.exists?(secretfile)
+  secret = Chef::EncryptedDataBagItem.load_secret('/etc/chef/encrypted_data_bag_secret')
+item = Chef::EncryptedDataBagItem.load('my_databag', 'sonar_credentials', secret)
+item['certs'].each do |cert|
+   file "/etc/httpd/#{cert['filename']}" do
+      content cert['data']
+    owner 'root'
+    mode '0755'
+    end
+ end
+end
+
+
+#_________________________________________________________
+
+
+https://artifactory.bbtnet.com/artifactory/internal-cloud-tmp/tomcat-8.0.24.tar.gz
+
+remote_file '/tmp/tomcat-8.0.24.tar.gz' do
+  source node[tomcat][url]
+  action :create
+end
+
+execute '/var/tomcat-8.0.24'
+  command 'echo 'afsf' >> /tmp/echo'
+end
+
+package
+  version node[tomcat][version]
+
+service
+
+***********Attribute filename (default.rb)
+
+default[tomcat][url] =  'https://artifactory.bbtnet.com/artifactory/internal-cloud-tmp/tomcat-8.0.24.tar.gz'
+
+default[tomcat][version] = '5.30.7'
+
+--------------second recipe
+execute 'to do echo' do
+  command 'echo "" >> /tmp/echo'
+  action :nothing
+end
+
+directory /path/ do
+ owner
+ group
+ mode
+end
+
+file '/var/sree' do
+  content ''
+  action :create
+  notify :run, 'execute[to do ech]'
+end
+_________________________________
+execute 'to do echo' do
+  command 'echo "" >> /tmp/echo'
+  not_if { File.exists?('/tmp/echo') }
+end
+
+_________________________________
+
+
+I am currently out of office until Monday October 2nd.  During this time I will have limited availability and will be delayed in responding to email.
+
+I appreciate your patience during this time.  Should you need immediate assistance, please reach out to the following:
+
+For all other requests, please contact
+
+
+
+__________________________________________
+{
+  "name": "Pyhton",
+  "description": "this is python base role",
+  "json_class": "Chef::Role",
+  "default_attribute": {
+
+  },
+  "chef_type": "role",
+  "run_list": [
+		"recipe[bbt_rhn]",
+		"recipe[bbt_python]"
+	],
+  "override_attribute": {
+  },
+  "env_run_list": {
+  },
+}
+
+____.rb/env
+
+name "mani role"
+description ""
+run_list "recipe[tomcat]"
+default_attribute({
+  "" => ""
+  })
+_______________________________________________
+Env
+{
+  "name": "dev",
+  "description": "",
+  "cookbook_versions": {
+
+  },
+  "json_class": "Chef::Environment",
+  "chef_type": "environment",
+  "default_attributes": {
+
+  },
+  "override_attributes": {
+
+  }
+}
+_____.rb/env
+
+name "dev"
+description "this is dev environ"
+cookbook "apache", "= 0.1.1"
+
+_________________________________________________________
+
+Session 11-
+explain role
+show role syntax
+
+
+create a cookbook with httpd
+
+
+hands on
+
+role
+1. create a role for apache
+
+
+environment
+1. create a dev environment
+    name "dev"
+    description "this is dev environ"
+    cookbook "apache", "= 0.1.1"
+
+2. create a prod environment
+
+    name "dev"
+    description "this is dev environ"
+    cookbook "apache", "= 0.2.1"
+
+
+
+
+
+
+
+knife bootstrap windows winrm 10.224.212.125 -N Dev -x vagrant -P 'vagrant'
+
+
+hostname = node['hostname']
+
+
+template "redis.conf" do
+ path "/etc/redis.conf"
+ source "redis.conf.erb"
+ owner node['redis']['user']
+ group node['redis']['group']
+ mode "0644"
+ variables(
+  :hostname => hostname
+    )
+end
+
+
+
+
+execute 'create_clusters' do
+  command "/opt/IBM/WebSphere/AppServer/bin/wsadmin.sh -f #{chefscripts}/create-#{cluster}.py -lang jython -user #{adminuser} -password #{adminpassword} -host #{hostname} -port 8879"
+  not_if "/opt/IBM/WebSphere/AppServer/bin/wsadmin.sh -f #{chefscripts}/check-#{cluster}.py -lang jython -user #{adminuser} -password #{adminpassword} -host #{hostname} -port 8879 | grep 'cluster is found: #{cluster}'"
+end
+
+
+
+
+****************************************************
+
+An attribute can be defined in a cookbook (or a recipe) and then used to override the default settings on a node. When a cookbook is loaded during a chef-client run, these attributes are compared to the attributes that are already present on the node. When the cookbook attributes take precedence over the default attributes, the chef-client will apply those new settings and values during the chef-client run on the node.
+
+An attribute file is located in the attributes/ sub-directory for a cookbook. When a cookbook is run against a node, the attributes contained in all attribute files are evaluated in the context of the node object. Node methods (when present) are used to set attribute values on a node. For example, the «apache2» cookbook contains an attribute file called default.rb, which contains the following attributes:
+
+default["apache"]["dir"]          = "/etc/apache2"
+default["apache"]["listen_ports"] = [ "80","443" ]
+The use of the node object (node) is implicit in the previous example; the following example defines the node object itself as part of the attribute:
+
+node.default["apache"]["dir"]          = "/etc/apache2"
+node.default["apache"]["listen_ports"] = [ "80","443" ]
+In our cookbook «my_cool_app» we want create directory for web app, add to this directory html file, generate config for nginx and enable this configuration. Let’s add all this by using Chef attributes and resources.
+
+default['my_cool_app']['web_dir']       = '/var/www/my_cool_app'
+default['my_cool_app']['user']          = 'vagrant'
+default['my_cool_app']['name']          = 'my_cool_app'
+
+
+# install needed package
+%w(git ntp).each do |pack|
+  package pack
+end
+
+# create directory for web app
+directory node['my_cool_app']['web_dir'] do
+  owner node['my_cool_app']['user']
+  mode "0755"
+  recursive true
+end
+
+# upload index.html file to web app directory as index.html
+cookbook_file "#{node['my_cool_app']['web_dir']}/index.html" do
+  owner node['my_cool_app']['user']
+  source "index.html"
+  mode 0755
+end
+
+# create nginx config from temlate nginx.conf.erb
+nginx_config = "#{node['nginx']['dir']}" +
+  "/sites-available/#{node['my_cool_app']['name']}.conf"
+template nginx_config do
+  source "nginx.conf.erb"
+  mode "0644"
+end
+
+# activate nginx.conf in nginx
+nginx_site "#{node['my_cool_app']['name']}.conf"
+server {
+    listen 80 default;
+    charset utf-8;
+    root <%= node['my_cool_app']['web_dir'] %>;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>My cool app</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, maximum-scale=1.0" />
+</head>
+<body>
+  <h1>This is my cool web app</h1>
+</body>
+</html>
+name             'my_cool_app'
+maintainer       'Alexey Vasiliev'
+maintainer_email 'leopard_ne@inbox.ru'
+license          'MIT'
+description      'Installs/Configures my_cool_app'
+long_description IO.read(File.join(File.dirname(__FILE__), 'README.md'))
+version          '0.1.0'
+***************************************************************************************************************************************
+file '/tmp/new.txt' do
+  content 'this is chef_dojo'
+end
+
+template 'chef_dojo_template' do
+  source 'chef_dojo.erb'
+  path '/var/chef_dojo'
+  variables(
+    user: 'mike'
+	)
+end
+
+
+<%= @user %>
+
+remote_file 'download_from_artifactory' do
+  source 'https://artifactory.bbtnet.com:443/artifactory/internal-cloud-tmp/tomcat-8.0.24.tar.gz'
+  path '/tmp/tomcat-8.0.24.tar.gz'
+  only_if { File.exists?('/var/chef_dojo') }
+end 
