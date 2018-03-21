@@ -1,0 +1,196 @@
+# Cloning a server repository
+# Run the git clone command in the directory where you want to store projects. 
+git clone ssh://a77052@gerrit.bbtnet.com:29418/example-project && scp -p -P 29418 a77052@gerrit.bbtnet.com:hooks/commit-msg example-project/.git/hooks/ 
+
+#Setup reasonable defaults for push.
+git config remote.origin.push HEAD:refs/for/master
+
+#After you get tired of trying to remeber these commands, feel free to use this script.
+
+Usage script_name <repo_name>
+#!/bin/bash
+
+if [ "$1" == "" ]; then
+  echo "Please add an argument that is the name of the repo you want to clone"
+  exit 1
+fi
+
+if [ -d $1 ]; then
+  echo "you already have this repo checked out"
+  exit 1
+fi
+
+git clone ssh://gerrit.bbtnet.com:29418/$1
+
+scp -p -P 29418 $USERNAME@gerrit.bbtnet.com:hooks/commit-msg $1/.git/hooks/
+
+cd $1
+
+git config remote.origin.push HEAD:refs/for/master
+
+### TODO: get version numbers from docker-jenkins-slave-chefdk
+### TODO: do version check to avoid updating if its ok
+
+#chef gem uninstall rubocop --force -x
+
+#chef gem install --clear-sources -s https://artifactory.bbtnet.com/artifactory/
+
+#rubygems rubocop -v '~> 0.43.0'
+
+#chef gem uninstall rspec-its --force -x -q -a
+#chef gem uninstall rspec-mocks --force -x -q -a
+#chef gem uninstall rspec-support --force -x -q -a
+#chef gem uninstall rspec-expectations --force -x -q -a
+#chef gem uninstall rspec-core --force -x -q -a
+#chef gem uninstall rspec --force -x -q -a
+
+#gem install
+#gem install --clear-sources -s https://artifactory.bbtnet.com/artifactory/rubyg
+
+#ems rspec -v '~> 3.4.0'
+
+
+#chef gem uninstall berkshelf --force -x
+
+#gem install --clear-sources -s https://artifactory.bbtnet.com/artifactory/rubyg
+
+#ems berkshelf -v '~> 4.3.2'
+
+cd ..
+
+
+# if bbt_rhel exists, grab the rubocop
+# if it does not, clone it, grap the rubocop, then clean it
+
+if [ -d "bbt_rhel" ]; then
+
+  cp bbt_rhel/.rubocop.yml $1/
+
+elif [ "$1" != "bbt_rhel" ]; then
+
+  git clone ssh://gerrit.bbtnet.com:29418/bbt_rhel
+
+  cp bbt_rhel/.rubocop.yml $1/
+
+  rm -rf bbt_rhel
+
+fi
+
+#------------------------------------------------------------------------------------
+#Creating a change
+
+#Create and switch to a new local branch
+#Our new local branch is named 'myfeature' and we plan to share our changes with the server's 'master' branch. We'll make sure 
+#we have the latest master changes and create our new branch.
+
+git fetch origin master
+
+#Modify files and commit.
+
+git status
+
+git add .
+
+git status
+
+git commit -m ""
+
+#to check logs
+git log
+
+#Push your change(s) to the server for review. 
+git push
+
+#---------------------------------------------------------------------------------------
+#Updating a change in review
+
+#The changeset is my last commit. 
+#Let's first verify that the last commit in fact matches the changeset, known to git as HEAD [of the git tree]. 
+#If it is, then we only need to amend the last commit and repush.
+
+#to view current HEAD
+git log HEAD -n 1
+
+# start
+# 1.Open the changeset in the Gerrit web console. 
+# 2.Find the Download button at the top right corner of the changeset web page. 
+# 3.Copy the command text for Checkout. 
+# 4.Run the command in your git repo.
+
+git fetch ssh://a77052@gerrit.bbtnet.com:29418/my_project refs/changes/95/695/1 && git checkout FETCH_HEAD
+
+# Modify files and amend the previous commit.
+
+git add .
+
+git status
+
+git commit --amend --no-edit
+# The --no-edit option reuses the existing commit message. If you'd like to edit the commit message, leave this option off. 
+
+
+git push origin HEAD:refs/for/master
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
